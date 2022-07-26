@@ -5,7 +5,7 @@ import {
   EventEmitter,
   OnChanges,
   SimpleChanges,
-  ChangeDetectionStrategy,
+  ChangeDetectionStrategy, OnInit,
 } from '@angular/core';
 import {
   FormControl,
@@ -26,11 +26,11 @@ import { Topping } from '../../models/topping.model';
   template: `
     <div class="pizza-form">
       <form [formGroup]="form">
-      
+
         <label>
           <h4>Pizza name</h4>
-          <input 
-            type="text" 
+          <input
+            type="text"
             formControlName="name"
             placeholder="e.g. Pepperoni"
             class="pizza-form__input"
@@ -41,7 +41,7 @@ import { Topping } from '../../models/topping.model';
             <p>Pizza must have a name</p>
           </div>
         </label>
-      
+
         <ng-content></ng-content>
 
         <label>
@@ -86,7 +86,7 @@ import { Topping } from '../../models/topping.model';
     </div>
   `,
 })
-export class PizzaFormComponent implements OnChanges {
+export class PizzaFormComponent implements OnChanges, OnInit {
   exists = false;
 
   @Input() pizza: Pizza;
@@ -112,17 +112,23 @@ export class PizzaFormComponent implements OnChanges {
     return this.nameControl.hasError('required') && this.nameControl.touched;
   }
 
+  ngOnInit(){
+    this.form
+      .get('toppings')
+      .valueChanges.pipe(
+      map(toppings => toppings.map((topping: Topping) => topping.id))
+    )
+      .subscribe(value => {
+        console.log('here');
+        this.selected.emit(value)
+      });
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if (this.pizza && this.pizza.id) {
       this.exists = true;
       this.form.patchValue(this.pizza);
     }
-    this.form
-      .get('toppings')
-      .valueChanges.pipe(
-        map(toppings => toppings.map((topping: Topping) => topping.id))
-      )
-      .subscribe(value => this.selected.emit(value));
   }
 
   createPizza(form: FormGroup) {

@@ -2,7 +2,7 @@ import {
   Component,
   Input,
   forwardRef,
-  ChangeDetectionStrategy,
+  ChangeDetectionStrategy, OnInit,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Topping } from '../../models/topping.model';
@@ -14,13 +14,13 @@ const PIZZA_TOPPINGS_ACCESSOR = {
 };
 
 @Component({
-  selector: 'pizza-toppings',
+  selector: ' pizza-toppings',
   providers: [PIZZA_TOPPINGS_ACCESSOR],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['pizza-toppings.component.scss'],
   template: `
     <div class="pizza-toppings">
-      <div 
+      <div
         class="pizza-toppings-item"
         *ngFor="let topping of toppings;"
         (click)="selectTopping(topping)"
@@ -31,8 +31,13 @@ const PIZZA_TOPPINGS_ACCESSOR = {
     </div>
   `,
 })
-export class PizzaToppingsComponent implements ControlValueAccessor {
+export class PizzaToppingsComponent implements ControlValueAccessor, OnInit {
   @Input() toppings: Topping[] = [];
+
+  ngOnInit() {
+    console.log('here123');
+    console.log(this.toppings);
+  }
 
   value: Topping[] = [];
 
@@ -48,10 +53,12 @@ export class PizzaToppingsComponent implements ControlValueAccessor {
   }
 
   writeValue(value: Topping[]) {
+    console.log(888);
     this.value = value;
   }
 
   selectTopping(topping: Topping) {
+    console.log('777');
     if (this.existsInToppings(topping)) {
       this.value = this.value.filter(item => item.id !== topping.id);
     } else {
